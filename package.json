@@ -1,0 +1,19 @@
+{
+  "name": "aoc-skill-building",
+  "description": "",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "nodemon days/day01.js"
+  },
+  "type": "module",
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@tsconfig/node18": "^2.0.1",
+    "@types/node": "^20.1.7",
+    "typescript": "^5.0.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
