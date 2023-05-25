@@ -6,7 +6,7 @@ util.inspect.defaultOptions.maxArrayLength = null;
 const inputText = readTextFile("days/day01_input.txt");
 const splitInputText = splitLines(inputText);
 
-let calorieCounts = [];
+let calorieCounts: number[] = [];
 let count = 0;
 
 splitInputText.forEach((item) => {
