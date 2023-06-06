@@ -3,7 +3,7 @@
   "description": "",
   "version": "1.0.0",
   "scripts": {
-    "start": "nodemon days/day01.js"
+    "start": "nodemon ./days/day02.ts"
   },
   "type": "module",
   "author": "",
@@ -14,6 +14,8 @@
     "typescript": "^5.0.4"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1",
+    "tsup": "^6.7.0"
   }
 }
