@@ -7,133 +7,147 @@ const inputText = readTextFile("days/day02_input.txt");
 const splitInputText = splitLines(inputText).filter((item) => item); // filter out empty items
 const games = splitInputText.map((item) => item.split(" ")); // [["A", "Y"], ["B", "X"], ["C", "Z"], ...]
 
-enum Players {
-  playerOne = "playerOne",
-  playerTwo = "playerTwo",
-}
+type Game = string[];
 
-enum Keys {
-  A = "A",
-  B = "B",
-  C = "C",
-  X = "X",
-  Y = "Y",
-  Z = "Z",
-}
+const playerOneGameIndex = 0;
+const playerTwoGameIndex = 1;
+const players = ["Player One", "Player Two"];
 
-enum PlayerOneKey {
-  A = Keys.A,
-  B = Keys.B,
-  C = Keys.C,
-}
-
-enum PlayerTwoKey {
-  X = Keys.X,
-  Y = Keys.Y,
-  Z = Keys.Z,
-}
-
-enum Shape {
-  rock = "rock",
-  paper = "paper",
-  scissors = "scissors",
-}
-
-const KeyShape = {
-  A: Shape.rock,
-  B: Shape.paper,
-  C: Shape.scissors,
-  X: Shape.rock,
-  Y: Shape.paper,
-  Z: Shape.scissors,
+// Map game keys to shapes
+const KeyShape: { [key: string]: string } = {
+  A: "rock",
+  B: "paper",
+  C: "scissors",
+  X: "rock",
+  Y: "paper",
+  Z: "scissors",
 };
 
-type Key = PlayerOneKey | PlayerTwoKey;
-type Game = [PlayerOneKey, PlayerTwoKey];
-
+// Map shapes to scores
 const shapeScoreConfig = {
   rock: 1,
   paper: 2,
   scissors: 3,
 };
 
+// Map game outcomes to scores
 const outcomeScoreConfig = {
   lose: 0,
   draw: 3,
-  win: 1,
+  win: 6,
 };
 
+// Map shapes to outcomes
+const winningShapeConfigWinningIndex = 0;
 const winningShapeConfig = [
-  {
-    game: [Shape.rock, Shape.scissors],
-    winningShape: Shape.rock,
-  },
-  {
-    game: [Shape.paper, Shape.rock],
-    winningShape: Shape.paper,
-  },
-  {
-    game: [Shape.scissors, Shape.paper],
-    winningShape: Shape.scissors,
-  },
+  ["rock", "scissors"], // rock beats scissors
+  ["paper", "rock"],
+  ["scissors", "paper"],
 ];
 
-function playerShape(key: Key): Shape {
+// Map keys to outcomes
+const winningKeyConfigWinningIndex = 0;
+const winningKeyConfig = [
+  ["A", "Z"], // Rock beats scissors, etc...
+  ["B", "X"],
+  ["C", "Y"],
+  ["X", "C"],
+  ["Y", "A"],
+  ["Z", "B"],
+];
+
+function playerShapeByKey(key: string) {
   return KeyShape[key];
 }
 
-function gameIsTie(game: Game) {
-  return playerShape(game[0]) === playerShape(game[1]);
+function gameIsDraw(game: Game) {
+  // true if the shapes are the same
+  return (
+    playerShapeByKey(game[playerOneGameIndex]) ===
+    playerShapeByKey(game[playerTwoGameIndex])
+  );
 }
 
-function getGameWinningShape(
-  game: [PlayerOneKey, PlayerTwoKey]
-): Shape | undefined {
-  if (gameIsTie(game)) return undefined;
-  const playerOneShape = playerShape(game[0]);
-  const playerTwoShape = playerShape(game[1]);
-  const winningShape = winningShapeConfig.find(
-    (item) =>
-      (item.game[0] === playerOneShape && item.game[1] === playerTwoShape) ||
-      (item.game[1] === playerOneShape && item.game[0] === playerTwoShape)
-  )?.winningShape;
-  return winningShape;
+function winningKeyConfigForGame(game: Game) {
+  if (gameIsDraw(game)) return null;
+  return winningKeyConfig.find(
+    (configItem) =>
+      (configItem[0] === game[0] && configItem[1] === game[1]) ||
+      (configItem[0] === game[1] && configItem[1] === game[0])
+  );
 }
 
-function getGameWinningKey(game: Game): Key | undefined {
-  if (gameIsTie(game)) return undefined;
-  const gameWinningShape = getGameWinningShape(game);
-  if (!gameWinningShape) return undefined;
-  const gameWinningKeyIndex = Object.values(KeyShape).indexOf(gameWinningShape);
-  const gameWinningKey = Object.keys(KeyShape)[gameWinningKeyIndex];
-  return gameWinningKey as Key;
+// The key that won the game
+function winningKeyForGame(game: Game) {
+  if (gameIsDraw(game)) return null;
+  const winningKeyConfig = winningKeyConfigForGame(game);
+  if (!winningKeyConfig) return null;
+  return winningKeyConfig[winningKeyConfigWinningIndex];
 }
 
-function getShapeScore(shape: Shape) {
+// The index of the winning key in the game array
+function winningGameIndex(game: Game) {
+  if (gameIsDraw(game)) return;
+  const winningKey = winningKeyForGame(game);
+  if (!winningKey) return;
+  return game.indexOf(winningKey);
+}
+
+function winningGamePlayer(game: Game) {
+  if (gameIsDraw(game)) return;
+  const winningIndex = winningGameIndex(game);
+  if (winningIndex === undefined) return;
+  return players[winningIndex];
+}
+
+function outcomeForPlayerAtIndex(game: Game, index: number) {
+  if (gameIsDraw(game)) return "draw";
+  const winningIndex = winningGameIndex(game);
+  if (winningIndex === index) return "win";
+  return "lose";
+}
+
+function outcomeScore(outcome: keyof typeof outcomeScoreConfig) {
+  return outcomeScoreConfig[outcome];
+}
+
+function shapeScore(shape: keyof typeof shapeScoreConfig) {
   return shapeScoreConfig[shape];
 }
 
-const testGame: [PlayerOneKey, PlayerTwoKey][] = [
-  [PlayerOneKey["A"], PlayerTwoKey["Y"]], // rock vs paper => win => 8
-  [PlayerOneKey["B"], PlayerTwoKey["X"]], // paper vs rock => loss => 1
-  [PlayerOneKey["C"], PlayerTwoKey["Z"]], // scissors vs scissors => draw => 6
-];
-
-function getGameWinningPlayer(game: Game) {}
-
-function gameResultsOutput(game: Game) {
-  return {
-    game,
-    gameShapes: [playerShape(game[0]), playerShape(game[1])],
-    shapeScores: [
-      getShapeScore(playerShape(game[0])),
-      getShapeScore(playerShape(game[1])),
-    ],
-    winningShape: getGameWinningShape(game),
-    winningKey: getGameWinningKey(game),
-  };
+function scoreGameForPlayerAtIndex(game: Game, index: number) {
+  const outcomeForPlayer = outcomeForPlayerAtIndex(game, index);
+  const shapeForPlayer = KeyShape[game[index]];
+  return (
+    outcomeScore(outcomeForPlayer) +
+    shapeScore(shapeForPlayer as keyof typeof shapeScoreConfig)
+  );
 }
 
-testGame.forEach((game) => {
-  console.log(gameResultsOutput(game));
-});
+const playerTwoTotalScore = games.reduce((acc, game) => {
+  const scoreForPlayerTwo = scoreGameForPlayerAtIndex(game, playerTwoGameIndex);
+  return acc + scoreForPlayerTwo;
+}, 0);
+
+console.log(playerTwoTotalScore);
+
+// const testGames = [
+//   ["A", "Y"],
+//   ["B", "X"],
+//   ["C", "Z"],
+// ];
+
+// function gameOutcomeLog(game: Game) {
+//   return {
+//     game,
+//     winningKey: gameIsDraw(game) ? "DRAW" : winningKeyForGame(game),
+//     winningGameIndex: gameIsDraw(game) ? "DRAW" : winningGameIndex(game),
+//     winningPlayer: gameIsDraw(game) ? "DRAW" : winningGamePlayer(game),
+//     playerOneScore: scoreGameForPlayerAtIndex(game, 0),
+//     playerTwoScore: scoreGameForPlayerAtIndex(game, 1),
+//   };
+// }
+
+// testGames.forEach((game) => {
+//   console.log(gameOutcomeLog(game));
+// });
