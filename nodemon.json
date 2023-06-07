@@ -1,0 +1,6 @@
+{
+  "watch": ["days"],
+  "ext": "ts,json",
+  "ignore": [],
+  "exec": "ts-node-esm ./days/day02.ts"
+}
