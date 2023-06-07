@@ -39,14 +39,14 @@ enum Shape {
   scissors = "scissors",
 }
 
-enum KeyShape {
-  A = Shape.rock,
-  B = Shape.paper,
-  C = Shape.scissors,
-  X = Shape.rock,
-  Y = Shape.paper,
-  Z = Shape.scissors,
-}
+const KeyShape = {
+  A: Shape.rock,
+  B: Shape.paper,
+  C: Shape.scissors,
+  X: Shape.rock,
+  Y: Shape.paper,
+  Z: Shape.scissors,
+};
 
 type Key = PlayerOneKey | PlayerTwoKey;
 type Game = [PlayerOneKey, PlayerTwoKey];
@@ -79,7 +79,7 @@ const winningShapeConfig = [
 ];
 
 function playerShape(key: Key): Shape {
-  return Shape[KeyShape[key]];
+  return KeyShape[key];
 }
 
 function gameIsTie(game: Game) {
@@ -104,11 +104,9 @@ function getGameWinningKey(game: Game): Key | undefined {
   if (gameIsTie(game)) return undefined;
   const gameWinningShape = getGameWinningShape(game);
   if (!gameWinningShape) return undefined;
-
-  // The game winning key is the key of the game winning shape
-  const gameWinningKey = Object.values(KeyShape).indexOf(
-    Shape[gameWinningShape]
-  );
+  const gameWinningKeyIndex = Object.values(KeyShape).indexOf(gameWinningShape);
+  const gameWinningKey = Object.keys(KeyShape)[gameWinningKeyIndex];
+  return gameWinningKey as Key;
 }
 
 function getShapeScore(shape: Shape) {
@@ -132,6 +130,7 @@ function gameResultsOutput(game: Game) {
       getShapeScore(playerShape(game[1])),
     ],
     winningShape: getGameWinningShape(game),
+    winningKey: getGameWinningKey(game),
   };
 }
 
