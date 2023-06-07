@@ -37,14 +37,6 @@ const outcomeScoreConfig = {
   win: 6,
 };
 
-// Map shapes to outcomes
-const winningShapeConfigWinningIndex = 0;
-const winningShapeConfig = [
-  ["rock", "scissors"], // rock beats scissors
-  ["paper", "rock"],
-  ["scissors", "paper"],
-];
-
 // Map keys to outcomes
 const winningKeyConfigWinningIndex = 0;
 const winningKeyConfig = [
