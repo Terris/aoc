@@ -11,10 +11,9 @@ type Game = string[];
 
 const playerOneGameIndex = 0;
 const playerTwoGameIndex = 1;
-const players = ["Player One", "Player Two"];
 
 // Map game keys to shapes
-const KeyShape: { [key: string]: string } = {
+const KeyShape: Record<string, string> = {
   A: "rock",
   B: "paper",
   C: "scissors",
@@ -24,14 +23,14 @@ const KeyShape: { [key: string]: string } = {
 };
 
 // Map shapes to scores
-const shapeScoreConfig = {
+const shapeScoreConfig: Record<string, number> = {
   rock: 1,
   paper: 2,
   scissors: 3,
 };
 
 // Map game outcomes to scores
-const outcomeScoreConfig = {
+const outcomeScoreConfig: Record<string, number> = {
   lose: 0,
   draw: 3,
   win: 6,
@@ -54,9 +53,9 @@ function playerShapeByKey(key: string) {
 
 function gameIsDraw(game: Game) {
   // true if the shapes are the same
-  return (
+  return Boolean(
     playerShapeByKey(game[playerOneGameIndex]) ===
-    playerShapeByKey(game[playerTwoGameIndex])
+      playerShapeByKey(game[playerTwoGameIndex])
   );
 }
 
@@ -85,13 +84,6 @@ function winningGameIndex(game: Game) {
   return game.indexOf(winningKey);
 }
 
-function winningGamePlayer(game: Game) {
-  if (gameIsDraw(game)) return;
-  const winningIndex = winningGameIndex(game);
-  if (winningIndex === undefined) return;
-  return players[winningIndex];
-}
-
 function outcomeForPlayerAtIndex(game: Game, index: number) {
   if (gameIsDraw(game)) return "draw";
   const winningIndex = winningGameIndex(game);
@@ -99,21 +91,18 @@ function outcomeForPlayerAtIndex(game: Game, index: number) {
   return "lose";
 }
 
-function outcomeScore(outcome: keyof typeof outcomeScoreConfig) {
+function outcomeScore(outcome: string) {
   return outcomeScoreConfig[outcome];
 }
 
-function shapeScore(shape: keyof typeof shapeScoreConfig) {
+function shapeScore(shape: string) {
   return shapeScoreConfig[shape];
 }
 
 function scoreGameForPlayerAtIndex(game: Game, index: number) {
   const outcomeForPlayer = outcomeForPlayerAtIndex(game, index);
   const shapeForPlayer = KeyShape[game[index]];
-  return (
-    outcomeScore(outcomeForPlayer) +
-    shapeScore(shapeForPlayer as keyof typeof shapeScoreConfig)
-  );
+  return outcomeScore(outcomeForPlayer) + shapeScore(shapeForPlayer);
 }
 
 const playerTwoTotalScore = games.reduce((acc, game) => {
@@ -121,7 +110,8 @@ const playerTwoTotalScore = games.reduce((acc, game) => {
   return acc + scoreForPlayerTwo;
 }, 0);
 
-console.log(playerTwoTotalScore);
+const result = playerTwoTotalScore;
+console.log(result);
 
 // const testGames = [
 //   ["A", "Y"],

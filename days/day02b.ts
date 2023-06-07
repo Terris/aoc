@@ -9,34 +9,24 @@ const games = splitInputText.map((item) => item.split(" ")); // [["A", "Y"], ["B
 
 type Game = string[];
 
-const playerOneGameIndex = 0;
-const playerTwoGameIndex = 1;
-const players = ["Player One", "Player Two"];
 const gameShapeIndex = 0;
 const gameOutcomeIndex = 1;
 
-// Map game keys to shapes
-const KeyShape: { [key: string]: string } = {
-  A: "rock",
-  B: "paper",
-  C: "scissors",
-};
-
 // Map shapes to scores
-const shapeKeyScoreConfig = {
+const shapeKeyScoreConfig: Record<string, number> = {
   A: 1,
   B: 2,
   C: 3,
 };
 
 // Map game outcomes to scores
-const outcomeScoreConfig = {
+const outcomeScoreConfig: Record<string, number> = {
   lose: 0,
   draw: 3,
   win: 6,
 };
 
-const keyOutcomeConfig = {
+const keyOutcomeConfig: Record<string, string> = {
   X: "lose",
   Y: "draw",
   Z: "win",
@@ -48,12 +38,16 @@ const gameRulesConfig = [
   ["C", "B"],
 ];
 
-const rulesConfigIndexToSearchForDesiredOutcome = {
+// given a desired outcome, select the index in each gameRuleConfig to search
+// example: if we want to lose we should search for the opponents shape in the 0 index position of wach game rule
+const rulesConfigIndexToSearchForDesiredOutcome: Record<string, number> = {
   lose: 0,
   win: 1,
 };
 
-const indexOfRuleKeyForDesiredOutcome = {
+// given a desired outcome, select the array index we want to return as the desired shapeKey
+// example: if we want to win we should return the ruleConfig shapeKey at index 0
+const indexOfRuleKeyForDesiredOutcome: Record<string, number> = {
   lose: 1,
   win: 0,
 };
@@ -68,15 +62,14 @@ function desiredOutcomeKeyForGame(game: Game) {
 
 function desiredOutcomeForGame(game: Game) {
   const outcomeKey = desiredOutcomeKeyForGame(game);
-  return keyOutcomeConfig[outcomeKey as keyof typeof keyOutcomeConfig];
+  return keyOutcomeConfig[outcomeKey];
 }
 
 function desiredGameRuleForDesiredOutcome(game: Game) {
   const desiredOutcome = desiredOutcomeForGame(game);
+  if (desiredOutcome === "draw") return;
   const rulesIndexToSearch =
-    rulesConfigIndexToSearchForDesiredOutcome[
-      desiredOutcome as keyof typeof rulesConfigIndexToSearchForDesiredOutcome
-    ];
+    rulesConfigIndexToSearchForDesiredOutcome[desiredOutcome];
   const desiredOutcomeGameRule = gameRulesConfig.find(
     (rule) => rule[rulesIndexToSearch] === game[gameShapeIndex]
   );
@@ -88,30 +81,23 @@ function desiredShapeKeyForDesiredOutcome(game: Game) {
   if (desiredOutcome === "draw") return keyForDrawOutcome(game);
   const desiredOutcomeGameRule = desiredGameRuleForDesiredOutcome(game);
   if (!desiredOutcomeGameRule) return;
-  return desiredOutcomeGameRule[
-    indexOfRuleKeyForDesiredOutcome[
-      desiredOutcome as keyof typeof indexOfRuleKeyForDesiredOutcome
-    ]
-  ];
+  const indexOfRuleKey = indexOfRuleKeyForDesiredOutcome[desiredOutcome];
+  const desiredShapeKey = desiredOutcomeGameRule[indexOfRuleKey];
+  return desiredShapeKey;
 }
 
-function outcomeScore(outcome: keyof typeof outcomeScoreConfig) {
+function outcomeScore(outcome: string) {
   return outcomeScoreConfig[outcome];
 }
 
-function shapeKeyScore(shapeKey: keyof typeof shapeKeyScoreConfig) {
+function shapeKeyScore(shapeKey: string) {
   return shapeKeyScoreConfig[shapeKey];
 }
 
 function scoreForGame(game: Game) {
-  const desiredOutcome = desiredOutcomeForGame(
-    game
-  ) as keyof typeof outcomeScoreConfig;
-
-  const desiredShapeKey = desiredShapeKeyForDesiredOutcome(
-    game
-  ) as keyof typeof shapeKeyScoreConfig;
-
+  const desiredOutcome = desiredOutcomeForGame(game);
+  const desiredShapeKey = desiredShapeKeyForDesiredOutcome(game);
+  if (!desiredOutcome || !desiredShapeKey) return 0;
   return outcomeScore(desiredOutcome) + shapeKeyScore(desiredShapeKey);
 }
 
