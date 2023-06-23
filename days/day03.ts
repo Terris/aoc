@@ -68,20 +68,38 @@ const splitStringInHalf = (str: string) => [
   str.slice(str.length / 2),
 ];
 
-const matchLetterInTwoArrays = (str: string) => {
-  const splitString = splitStringInHalf(str);
-  const lettersArrays = splitString.map(stringToLetterArray);
-  for (let letter of lettersArrays[0]) {
-    if (lettersArrays[1].includes(letter)) {
+const matchLetterInArrayOfStrings = (arr: string[]) => {
+  for (let letter of arr[0]) {
+    if (arr.every((str) => str.includes(letter))) {
       return letter;
     }
   }
 };
 
-const matches = splitInputText.map(matchLetterInTwoArrays);
-const matchesScore = matches.reduce((acc, match) => {
-  const score = letterScores.indexOf(match!) + 1;
-  return acc + score;
-}, 0);
+const matches: (string | undefined)[] = splitInputText.map((str) => {
+  const splitString = splitStringInHalf(str);
+  return matchLetterInArrayOfStrings(splitString);
+});
 
-console.log(matchesScore);
+const scoreReducer = (arr: (string | undefined)[]): number =>
+  arr.reduce((acc, item) => {
+    const score = letterScores.indexOf(item!) + 1;
+    return acc + score;
+  }, 0);
+
+const matchesScore: number = scoreReducer(matches);
+
+const partOneAnswer: number = matchesScore;
+
+const groupArrayItemsByN = (arr: string[], n: number) => {
+  const groups = [];
+  for (let i = 0; i < arr.length; i += n) {
+    groups.push(arr.slice(i, i + n));
+  }
+  return groups;
+};
+
+// PART TWO
+const splitInputTextByThree: string[][] = groupArrayItemsByN(splitInputText, 3);
+const inputTextBadges = splitInputTextByThree.map(matchLetterInArrayOfStrings);
+const partTwoAnswer = scoreReducer(inputTextBadges);
