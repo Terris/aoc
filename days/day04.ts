@@ -21,7 +21,7 @@ const splitAtComma = (input: string): string[] => input.split(",");
 const splitAtDash = (input: string): string[] => input.split("-");
 
 // ["2", "4"] => [2, 4]
-const stringArrayToNumberArray = (input: string[]): number[] =>
+const stringArrayToNumberArray = (input: (string | number)[]): number[] =>
   input.map((item) => Number(item));
 
 // count lines of input that are fully contained in another line
