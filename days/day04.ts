@@ -29,7 +29,7 @@ const fullyContainedCount = (input: string[]) =>
   input.reduce((acc, line) => {
     const lineToArray = splitAtComma(line);
     if (lineToArray.length > 2) {
-      throw new Error("isContained error: cant compare more than two items");
+      throw new Error("error: cant compare more than two items");
     }
 
     const sideA = stringArrayToNumberArray(splitAtDash(lineToArray[0]));
